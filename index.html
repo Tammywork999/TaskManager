@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Task Manager - Productivity Hub</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app-container">
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h2>📋 Task Manager</h2>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-group">
+          <div class="nav-group-title">Task Manager</div>
+          <div class="nav-item active" data-screen="dashboard" onclick="screenManager.navigateTo('dashboard'); return false;">🏠 Dashboard</div>
+          <div class="nav-item" data-screen="myDay" onclick="screenManager.navigateTo('myDay'); return false;">📅 My Day</div>
+          <div class="nav-item" data-screen="createTask" onclick="screenManager.navigateTo('createTask'); return false;">➕ Create Task</div>
+          <div class="nav-item" data-screen="tasksList" onclick="screenManager.navigateTo('tasksList'); return false;">📝 View All Tasks</div>
+          <div class="nav-item" data-screen="faira" onclick="screenManager.navigateTo('faira'); return false;">📂 FAIRA</div>
+          <div class="nav-item" data-screen="reports" onclick="screenManager.navigateTo('reports'); return false;">📊 Reports</div>
+          <div class="nav-item" data-screen="settings" onclick="screenManager.navigateTo('settings'); return false;">⚙️ Settings</div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-title">Coming Soon</div>
+          <div class="nav-item" style="opacity:0.5;cursor:not-allowed">📝 Notes</div>
+        </div>
+      </nav>
+    </aside>
+
+    <main id="main-content">
+      <div id="screen-dashboard" class="screen active">
+        <h1>Dashboard</h1>
+        <div id="dashboardContent"></div>
+      </div>
+
+      <div id="screen-myDay" class="screen">
+        <h1>My Day</h1>
+        <div id="myDayContent"></div>
+      </div>
+
+      <div id="screen-createTask" class="screen">
+        <h1>Create Task</h1>
+        <div class="card">
+          <div class="grid">
+            <div class="full">
+              <label>Task Name</label>
+              <input id="taskName">
+            </div>
+            <div>
+              <label>Area</label>
+              <select id="area">
+                <option>Work</option>
+                <option>Personal</option>
+              </select>
+            </div>
+            <div>
+              <label>Project</label>
+              <select id="projectInput"></select>
+            </div>
+            <div>
+              <label>Priority</label>
+              <select id="priority">
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+                <option>Critical</option>
+              </select>
+            </div>
+            <div>
+              <label>Status</label>
+              <select id="status">
+                <option>Not Started</option>
+                <option>In Progress</option>
+                <option>Waiting on Someone Else</option>
+                <option>Deferred</option>
+                <option>Completed</option>
+              </select>
+            </div>
+            <div>
+              <label>Due Date (Ctrl+Alt+T for today)</label>
+              <input id="dueDate" type="date">
+            </div>
+            <div>
+              <label>Follow Up Date</label>
+              <input id="followUpDate" type="date">
+            </div>
+            <div>
+              <label>Recurring</label>
+              <select id="recurrenceType" onchange="createTaskScreen.onRecurrenceChange()">
+                <option value="none">Does not repeat</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div id="recurringDowContainer" style="display:none">
+              <label>Days of Week</label>
+              <div class="recurrence-dow-group">
+                <label class="dow-label"><input type="checkbox" class="dow-check" value="1"> Mon</label>
+                <label class="dow-label"><input type="checkbox" class="dow-check" value="2"> Tue</label>
+                <label class="dow-label"><input type="checkbox" class="dow-check" value="3"> Wed</label>
+                <label class="dow-label"><input type="checkbox" class="dow-check" value="4"> Thu</label>
+                <label class="dow-label"><input type="checkbox" class="dow-check" value="5"> Fri</label>
+                <label class="dow-label"><input type="checkbox" class="dow-check" value="6"> Sat</label>
+                <label class="dow-label"><input type="checkbox" class="dow-check" value="0"> Sun</label>
+                <button type="button" onclick="createTaskScreen.selectAllWeekdays(); return false;" style="padding:4px 10px;font-size:12px;margin:0">All Weekdays</button>
+              </div>
+            </div>
+            <div>
+              <label>Recurring End Date</label>
+              <input id="recurrenceEndDate" type="date">
+            </div>
+            <div>
+              <label><input type="checkbox" id="focus"> Focus</label>
+            </div>
+            <div>
+              <label><input type="checkbox" id="addToMyDay"> Add To My Day</label>
+            </div>
+            <div class="full">
+              <label>Notes (Ctrl+Alt+D for date)</label>
+              <textarea id="notes" rows="8"></textarea>
+            </div>
+          </div>
+          <div class="task-meta-label">Date Created: <span id="createDateCreated"></span></div>
+          <button onclick="createTaskScreen.addTask(); return false;">Add Task</button>
+        </div>
+      </div>
+
+      <div id="screen-tasksList" class="screen">
+        <h1>View All Tasks</h1>
+        <div class="card">
+          <div class="filter-section">
+            <label><input type="checkbox" id="showCompleted" onchange="tasksListScreen.render()"> Show Completed Tasks</label>
+            <label><input type="checkbox" id="showFairas" checked onchange="tasksListScreen.render()"> Show FAIRAs</label>
+            <label><input type="checkbox" id="filterWork" checked onchange="tasksListScreen.render()"> Work</label>
+            <label><input type="checkbox" id="filterPersonal" checked onchange="tasksListScreen.render()"> Personal</label>
+            <label><input type="checkbox" id="filterUnassigned" checked onchange="tasksListScreen.render()"> Unassigned</label>
+            <span id="tasksListActiveCount" class="tasks-list-active-count"></span>
+          </div>
+        </div>
+        <table id="taskTable"></table>
+      </div>
+
+      <div id="screen-faira" class="screen">
+        <h1>FAIRA</h1>
+        <div id="fairaContent"></div>
+      </div>
+
+      <div id="screen-reports" class="screen">
+        <h1>Reports</h1>
+        <div id="reportsContent"></div>
+      </div>
+
+      <div id="screen-settings" class="screen">
+        <h1>Settings</h1>
+        <div id="settingsContent"></div>
+      </div>
+
+      <div id="screen-editTask" class="screen">
+        <h1>Edit Task</h1>
+        <div id="editTaskContainer"></div>
+      </div>
+
+      <div id="screen-viewTask" class="screen">
+        <h1>View Task</h1>
+        <div id="viewTaskContainer"></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="unsavedChangesModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>⚠️ Unsaved Changes</h3>
+      <p>You have unsaved changes. What would you like to do?</p>
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="screenManager.discardChanges()">Discard</button>
+        <button onclick="screenManager.cancelNavigation()">Cancel</button>
+        <button onclick="screenManager.saveAndNavigate()">Save & Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashboardOverlayModal" class="modal-overlay">
+    <div class="modal-content modal-content-wide">
+      <div class="dashboard-overlay-header">
+        <h3 id="dashboardOverlayTitle">Tasks</h3>
+        <button onclick="dashboardScreen.closeOverlay()" style="background-color:#6c757d">Close</button>
+      </div>
+      <div id="dashboardOverlayBody"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/screenManager.js"></script>
+  <script src="js/screens/dashboard.js"></script>
+  <script src="js/screens/myDay.js"></script>
+  <script src="js/screens/createTask.js"></script>
+  <script src="js/screens/tasksList.js"></script>
+  <script src="js/screens/editTask.js"></script>
+  <script src="js/screens/viewTask.js"></script>
+  <script src="js/screens/settings.js"></script>
+  <script src="js/screens/faira.js"></script>
+  <script src="js/screens/reports.js"></script>
+</body>
+</html>
