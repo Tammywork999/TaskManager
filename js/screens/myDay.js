@@ -83,7 +83,7 @@ const myDayScreen = {
   },
 
   renderAreaToggle(selected) {
-    return `<div class="myday-toggle-wrap"><div><div class="dashboard-kicker">Area Filter</div><h3>Show</h3></div><div class="myday-toggle-group">${["All", "Work", "Personal", "Unassigned"].map(value => this.renderAreaToggleButton(value, selected)).join("")}</div></div>`;
+    return `<div class="myday-toggle-wrap"><div><div class="dashboard-kicker">Area Filter</div><h3>Show</h3></div><div class="myday-toggle-group">${["All", "Work", "Personal", "Unassigned"].map(va => this.renderAreaToggleButton(va, selected)).join('')}</div></div>`;
   },
 
   renderAreaToggleButton(value, selected) {
@@ -96,60 +96,24 @@ const myDayScreen = {
       <div class="myday-area-block">
         <h4>${areaName} (${areaTasks.length})</h4>
         ${areaTasks.length === 0 ? `<p class="dashboard-empty-state">No ${areaName.toLowerCase()} tasks.</p>` : `
-          <table class="myday-task-table">
-            <tr>
-              <th onclick="myDayScreen.sortColumn('name')">Task ↕</th>
-              <th onclick="myDayScreen.sortColumn('notes')">Notes ↕</th>
-              <th onclick="myDayScreen.sortColumn('dueDate')">Due Date ↕</th>
-              <th onclick="myDayScreen.sortColumn('followUpDate')">Follow Up ↕</th>
-              <th onclick="myDayScreen.sortColumn('recurrenceType')">Recurring ↕</th>
-              <th onclick="myDayScreen.sortColumn('priority')">Priority ↕</th>
-              <th onclick="myDayScreen.sortColumn('status')">Status ↕</th>
-              <th onclick="myDayScreen.sortColumn('project')">Project ↕</th>
-              <th class="small">Focus</th>
-              <th class="small">My Day</th>
-              <th class="small">Edit</th>
-            </tr>
-            ${areaTasks.map(task => this.renderTaskRow(task)).join("")}
+          <table class="dashboard-task-table">
+            ${typeof tasksListScreen !== 'undefined' ? tasksListScreen.tableHeader(true) : `<tr><th>Area</th><th>Task</th><th>Notes</th><th>Due Date</th><th>Follow Up</th><th>Recurring</th><th>Priority</th><th>Status</th><th>Project</th><th class="small">Focus</th><th class="small">My Day</th><th class="small">Actions</th></tr>`}
+            ${areaTasks.map(task => (typeof tasksListScreen !== 'undefined' ? tasksListScreen.rowHtml(task, true) : this.renderTaskRow(task))).join("")}
           </table>`}
       </div>`;
   },
 
   renderUnassignedTable(unassignedTasks) {
     return `
-      <table class="myday-task-table">
-        <tr>
-          <th onclick="myDayScreen.sortColumn('name')">Task ↕</th>
-          <th onclick="myDayScreen.sortColumn('notes')">Notes ↕</th>
-          <th onclick="myDayScreen.sortColumn('dueDate')">Due Date ↕</th>
-          <th onclick="myDayScreen.sortColumn('followUpDate')">Follow Up ↕</th>
-          <th onclick="myDayScreen.sortColumn('recurrenceType')">Recurring ↕</th>
-          <th onclick="myDayScreen.sortColumn('priority')">Priority ↕</th>
-          <th onclick="myDayScreen.sortColumn('status')">Status ↕</th>
-          <th onclick="myDayScreen.sortColumn('project')">Project ↕</th>
-          <th class="small">Focus</th>
-          <th class="small">My Day</th>
-          <th class="small">Edit</th>
-        </tr>
-        ${unassignedTasks.map(task => this.renderTaskRow(task)).join("")}
+      <table class="dashboard-task-table">
+        ${typeof tasksListScreen !== 'undefined' ? tasksListScreen.tableHeader(true) : `<tr><th>Area</th><th>Task</th><th>Notes</th><th>Due Date</th><th>Follow Up</th><th>Recurring</th><th>Priority</th><th>Status</th><th>Project</th><th class="small">Focus</th><th class="small">My Day</th><th class="small">Actions</th></tr>`}
+        ${unassignedTasks.map(task => (typeof tasksListScreen !== 'undefined' ? tasksListScreen.rowHtml(task, true) : this.renderTaskRow(task))).join("")}
       </table>`;
   },
 
   renderTaskRow(task) {
     let overdueClass = this.isOverdue(task) ? "dashboard-task-text-alert" : "";
-    return `<tr class="${overdueClass}">
-      <td>${escapeHtml(task.name)}</td>
-      <td>${escapeHtml(firstLine(task.notes)) || "-"}</td>
-      <td>${formatDateDisplay(task.dueDate)}</td>
-      <td title="${task.followUpDate ? formatDateDisplay(task.followUpDate) : "No follow up"}" style="text-align:center">${task.followUpDate ? `${FOLLOW_UP_ICON}` : "-"}</td>
-      <td title="${escapeHtml(getRecurringLabel(task))}" style="text-align:center">${getRecurringIcon(task) || "-"}</td>
-      <td>${escapeHtml(task.priority)}</td>
-      <td>${escapeHtml(task.status)}</td>
-      <td>${escapeHtml(task.project || "-")}</td>
-      <td style="text-align:center">${task.focus ? "⭐" : ""}</td>
-      <td style="text-align:center">${task.pin ? "📌" : ""}</td>
-      <td style="text-align:center"><button onclick="myDayScreen.openEdit(${task.id}); return false;">Edit</button></td>
-    </tr>`;
+    return `<tr class="${overdueClass}"><td>${escapeHtml(task.name)}</td><td>${escapeHtml(firstLine(task.notes)) || "-"}</td><td>${formatDateDisplay(task.dueDate)}</td><td title="${task.followUpDate ? formatDateDisplay(task.followUpDate) : "No follow up"}" style="text-align:center">${task.followUpDate ? `${FOLLOW_UP_ICON}` : "-"}</td><td title="${escapeHtml(getRecurringLabel(task))}" style="text-align:center">${getRecurringIcon(task) || "-"}</td><td>${escapeHtml(task.priority)}</td><td>${escapeHtml(task.status)}</td><td>${escapeHtml(task.project || "-")}</td><td style="text-align:center">${task.focus ? "⭐" : ""}</td><td style="text-align:center">${task.pin ? "📌" : ""}</td><td style="text-align:center"><button onclick="myDayScreen.openEdit(${task.id}); return false;">Edit</button></td></tr>`;
   },
 
   groupByArea(sectionTasks, selectedAreas) {
