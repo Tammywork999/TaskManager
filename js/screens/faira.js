@@ -18,19 +18,8 @@ const fairaScreen = {
         </div>
       </div>
       <table class="dashboard-task-table">
-        <tr>
-          <th onclick="fairaScreen.sortTable('area')">Area ↕</th>
-          <th onclick="fairaScreen.sortTable('name')">Task ↕</th>
-          <th onclick="fairaScreen.sortTable('notes')">Notes ↕</th>
-          <th onclick="fairaScreen.sortTable('dueDate')">Due Date ↕</th>
-          <th onclick="fairaScreen.sortTable('priority')">Priority ↕</th>
-          <th onclick="fairaScreen.sortTable('status')">Status ↕</th>
-          <th onclick="fairaScreen.sortTable('followUpDate')">Follow Up ↕</th>
-          <th class="small">Focus</th>
-          <th class="small">My Day</th>
-          <th class="small">Actions</th>
-        </tr>
-        ${filtered.length === 0 ? `<tr><td colspan="10" style="text-align:center;padding:30px">No tasks found</td></tr>` : filtered.map(task => this.renderRow(task)).join("")}
+        ${typeof tasksListScreen !== 'undefined' ? tasksListScreen.tableHeader(false) : `<tr><th>Task</th><th>Notes</th><th>Due Date</th><th>Follow Up</th><th>Recurring</th><th>Priority</th><th>Status</th><th>Project</th><th class="small">Focus</th><th class="small">My Day</th><th class="small">Actions</th></tr>`}
+        ${filtered.length === 0 ? `<tr><td colspan="11" style="text-align:center;padding:30px">No tasks found</td></tr>` : filtered.map(task => (typeof tasksListScreen !== 'undefined' ? tasksListScreen.rowHtml(task, false) : this.renderRow(task))).join("")}
       </table>
     `;
   },
@@ -38,13 +27,14 @@ const fairaScreen = {
   renderRow(task) {
     let actionBtn = task.status === "Completed" ? `<button onclick="viewTaskScreen.show(${task.id}, 'faira'); return false;">View</button>` : `<button onclick="editTaskScreen.show(${task.id}, 'faira'); return false;">Edit</button>`;
     return `<tr>
-      <td>${escapeHtml(getTaskAreaLabel(task))}</td>
       <td>${escapeHtml(task.name)}</td>
       <td>${escapeHtml(firstLine(task.notes)) || "-"}</td>
       <td>${formatDateDisplay(task.dueDate)}</td>
+      <td title="${task.followUpDate ? formatDateDisplay(task.followUpDate) : "No follow up"}" style="text-align:center">${task.followUpDate ? `${FOLLOW_UP_ICON} ${formatDateDisplay(task.followUpDate)}` : "-"}</td>
+      <td title="${escapeHtml(getRecurringLabel(task))}" style="text-align:center">${getRecurringIcon(task) || "-"}</td>
       <td>${escapeHtml(task.priority || "-")}</td>
       <td>${escapeHtml(task.status)}</td>
-      <td title="${task.followUpDate ? formatDateDisplay(task.followUpDate) : "No follow up"}" style="text-align:center">${task.followUpDate ? `${FOLLOW_UP_ICON} ${formatDateDisplay(task.followUpDate)}` : "-"}</td>
+      <td>${escapeHtml(task.project || "-")}</td>
       <td style="text-align:center">${task.focus ? "⭐" : ""}</td>
       <td style="text-align:center">${task.pin ? "📌" : ""}</td>
       <td style="text-align:center">${actionBtn}</td>

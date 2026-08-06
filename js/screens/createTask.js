@@ -28,7 +28,8 @@ const createTaskScreen = {
     let recurrenceType = document.getElementById("recurrenceType").value;
     let dowContainer = document.getElementById("recurringDowContainer");
     if (dowContainer) {
-      dowContainer.style.display = recurrenceType === "weekly" ? "block" : "none";
+      // Use flex so the recurrence day-of-week checkboxes render horizontally with the new CSS
+      dowContainer.style.display = recurrenceType === "weekly" ? "flex" : "none";
     }
   },
 
